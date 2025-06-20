@@ -56,11 +56,7 @@ class Program
                         Console.WriteLine("Resultado limpiado.");
                         break;
                     case 6:
-                        Console.WriteLine("Historial de operaciones:");
-                        foreach (var op in Calc.Historial)
-                        {
-                            Console.WriteLine(op);
-                        }
+                        Calc.MostrarHistorial();
                         break;
                     case 0:
                         salir = true;

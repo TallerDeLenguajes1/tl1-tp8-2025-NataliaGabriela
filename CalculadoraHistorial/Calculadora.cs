@@ -1,95 +1,83 @@
-namespace EspacioCalculadora
+namespace EspacioCalculadora;
+
+public class Calculadora
 {
-    public enum TipoOperacion
+    private double termino;
+    private bool primera = true;
+    public List<Operacion> historial { get; set; } = new List<Operacion>();
+    public double Resultado
     {
-        Suma,
-        Resta,
-        Multiplicacion,
-        Division,
-        Limpiar
+        get => termino;
     }
-
-    public class Operacion
+    public void Sumar(double Termino)
     {
-        private double resultadoAnterior;
-        private double nuevoValor;
-        private TipoOperacion operacion;
-
-        public Operacion(double resultadoAnterior, double nuevoValor, TipoOperacion operacion)
+        historial.Add(new Operacion(termino, Termino, TipoOperacion.Suma));
+        termino += Termino;
+        primera = false;
+    }
+    public void Restar(double Termino)
+    {
+        historial.Add(new Operacion(termino, Termino, TipoOperacion.Resta));
+        termino -= Termino;
+        primera = false;
+    }
+    public void Multiplicar(double Termino)
+    {
+        if (primera)
         {
-            this.resultadoAnterior = resultadoAnterior;
-            this.nuevoValor = nuevoValor;
-            this.operacion = operacion;
+            termino = Termino;
+            primera = false;
+        }
+        else
+        {
+            historial.Add(new Operacion(termino, Termino, TipoOperacion.Multiplicacion));
+            termino = Resultado * Termino;
         }
 
-        public double Resultado
+    }
+    public void Dividir(double Termino)
+    {
+        if (primera)
         {
-            get
+            termino = Termino;
+            primera = false;
+        }
+        else
+        {
+            if (Termino != 0)
             {
-                switch (operacion)
-                {
-                    case TipoOperacion.Suma:
-                        return resultadoAnterior + nuevoValor;
-                    case TipoOperacion.Resta:
-                        return resultadoAnterior - nuevoValor;
-                    case TipoOperacion.Multiplicacion:
-                        return resultadoAnterior * nuevoValor;
-                    case TipoOperacion.Division:
-                        return nuevoValor != 0 ? resultadoAnterior / nuevoValor : double.NaN;
-                    case TipoOperacion.Limpiar:
-                        return 0;
-                    default:
-                        return 0;
-                }
+
+                historial.Add(new Operacion(termino, Termino, TipoOperacion.Division));
+                termino /= Termino;
+            }
+            else
+            {
+                Console.WriteLine("No se puede dividir por cero.");
             }
         }
 
-        public double NuevoValor => nuevoValor;
-        public TipoOperacion OperacionTipo => operacion;
 
-        public override string ToString()
-        {
-            string simbolo = operacion switch
-            {
-                TipoOperacion.Suma => "+",
-                TipoOperacion.Resta => "-",
-                TipoOperacion.Multiplicacion => "*",
-                TipoOperacion.Division => "/",
-                TipoOperacion.Limpiar => "Limpiar",
-                _ => ""
-            };
-            return operacion == TipoOperacion.Limpiar
-                ? $"Operación: {simbolo}, Resultado: 0"
-                : $"{resultadoAnterior} {simbolo} {nuevoValor} = {Resultado}";
-        }
     }
-
-    public class Calculadora
+    public void Limpiar()
     {
-        private double termino;
-        private List<Operacion> historial = new List<Operacion>();
-
-        public double Resultado => termino;
-
-        public IReadOnlyList<Operacion> Historial => historial.AsReadOnly();
-
-        private void AgregarOperacion(double valor, TipoOperacion tipo)
-        {
-            var operacion = new Operacion(termino, valor, tipo);
-            termino = operacion.Resultado;
-            historial.Add(operacion);
-
-            if (tipo == TipoOperacion.Limpiar)
-            {
-                historial.Clear();
-                termino = 0;
-            }
-        }
-
-        public void Sumar(double valor) => AgregarOperacion(valor, TipoOperacion.Suma);
-        public void Restar(double valor) => AgregarOperacion(valor, TipoOperacion.Resta);
-        public void Multiplicar(double valor) => AgregarOperacion(valor, TipoOperacion.Multiplicacion);
-        public void Dividir(double valor) => AgregarOperacion(valor, TipoOperacion.Division);
-        public void Limpiar() => AgregarOperacion(0, TipoOperacion.Limpiar);
+        historial.Add(new Operacion(termino, 0, TipoOperacion.Limpiar));
+        termino = 0;
+        primera = true;
     }
+
+    public void MostrarHistorial()
+    {
+        if (historial.Count == 0)
+        {
+            Console.WriteLine("No hay operaciones en el historial");
+            return;
+        }
+        Console.WriteLine("\nHistorial de Operaciones: ");
+        foreach (var item in historial)
+        {
+            Console.WriteLine(item.ToString());
+        }
+    }
+
 }
+
